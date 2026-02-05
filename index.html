@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>홍길동 학생 명함</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      /* 1. 기본 리셋 및 배경 설정 */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Noto Sans KR", sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f3f4f6; /* 부드러운 회색 배경 */
+        perspective: 1000px; /* 3D 효과를 위한 원근감 */
+      }
+
+      /* 2. 명함 컨테이너 (90mm x 50mm) */
+      .card-container {
+        width: 90mm;
+        height: 50mm;
+        position: relative;
+        transform-style: preserve-3d; /* 3D 변형 유지 */
+        cursor: pointer;
+      }
+
+      .card {
+        width: 100%;
+        height: 100%;
+        background: white;
+        border-radius: 10px; /* 둥근 모서리 */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        text-align: center;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        position: relative;
+
+        /* 그라데이션 데코레이션 */
+        background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+      }
+
+      /* 강조 색상 변수 */
+      :root {
+        --primary-color: #3b82f6;
+        --text-dark: #1f2937;
+        --text-gray: #6b7280;
+      }
+
+      /* 3. 콘텐츠 스타일링 */
+
+      /* 상단: 학교 & MBTI */
+      .top-info {
+        font-size: 8px;
+        color: var(--text-gray);
+        font-weight: 500;
+        letter-spacing: -0.5px;
+        margin-top: 2px;
+      }
+
+      .badge {
+        background-color: #dbeafe;
+        color: var(--primary-color);
+        padding: 1px 4px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 7px;
+        margin-left: 3px;
+        vertical-align: middle;
+      }
+
+      /* 메인: 이름 & 타이핑 효과 */
+      .main-info {
+        margin: 2px 0;
+      }
+
+      .name {
+        font-size: 18px;
+        font-weight: 900;
+        color: var(--text-dark);
+        line-height: 1.2;
+      }
+
+      .typing-container {
+        font-size: 8px;
+        color: var(--primary-color);
+        height: 12px; /* 높이 고정으로 떨림 방지 */
+        font-weight: 700;
+      }
+
+      /* 커서 깜빡임 효과 */
+      .cursor {
+        display: inline-block;
+        width: 1px;
+        background-color: var(--primary-color);
+        animation: blink 1s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* 중단: 키워드 (해시태그) */
+      .keywords {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .tag {
+        font-size: 6px;
+        color: #4b5563;
+        background-color: #f3f4f6;
+        padding: 2px 5px;
+        border-radius: 10px;
+        white-space: nowrap;
+      }
+
+      /* 하단: 상세 정보 및 아이콘 */
+      .footer {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+      }
+
+      .dream {
+        font-size: 7px;
+        color: var(--text-gray);
+      }
+
+      .social-links {
+        display: flex;
+        gap: 12px;
+        margin-top: 2px;
+      }
+
+      .icon-btn {
+        text-decoration: none;
+        color: var(--text-gray);
+        font-size: 12px;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* 아이콘 호버 및 클릭 효과 */
+      .icon-btn:hover {
+        color: var(--primary-color);
+        transform: scale(1.2);
+      }
+
+      .icon-btn:active {
+        transform: scale(0.9); /* 클릭 시 축소 (쫀득한 느낌) */
+      }
+
+      /* 툴팁 (이메일 등 추가 정보 표시용) */
+      .tooltip {
+        position: relative;
+      }
+
+      .tooltip:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 8px;
+        white-space: nowrap;
+        margin-bottom: 5px;
+        pointer-events: none;
+      }
+
+      /* 장식용 배경 원 */
+      .bg-deco {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(
+          circle,
+          rgba(59, 130, 246, 0.1) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        border-radius: 50%;
+        top: -20px;
+        right: -20px;
+        z-index: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card-container" id="cardContainer">
+      <div class="card" id="card">
+        <div class="bg-deco"></div>
+
+        <div class="top-info">
+          ○○중학교 2학년 3반 <span class="badge">ENFP</span>
+        </div>
+
+        <div class="main-info">
+          <div class="name">홍길동</div>
+          <div class="typing-container">
+            <span id="typing-text"></span><span class="cursor">|</span>
+          </div>
+        </div>
+
+        <div class="keywords">
+          <span class="tag">#활발함</span>
+          <span class="tag">#아이디어뱅크</span>
+          <span class="tag">#친화력갑</span>
+        </div>
+
+        <div class="footer">
+          <div class="dream">
+            <i
+              class="fa-solid fa-rocket"
+              style="color: var(--primary-color)"
+            ></i>
+            웹 개발자 • 유튜버 • 선생님
+          </div>
+
+          <div class="social-links">
+            <a
+              href="https://instagram.com/my_insta_id"
+              target="_blank"
+              class="icon-btn tooltip"
+              data-tooltip="@my_insta_id"
+            >
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+
+            <a
+              href="mailto:user@email.com"
+              class="icon-btn tooltip"
+              data-tooltip="user@email.com"
+            >
+              <i class="fa-regular fa-envelope"></i>
+            </a>
+
+            <div class="icon-btn tooltip" data-tooltip="방송반 & 댄스부">
+              <i class="fa-solid fa-masks-theater"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* --- 기능 1: 타이핑 효과 (별명 로테이션) --- */
+      const textElement = document.getElementById("typing-text");
+      const nicknames = ["별명: 길동이", "별명: 척척박사", "취미: 게임 & 그림"]; // 타이핑될 텍스트들
+      let nickIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+      let typingSpeed = 100;
+
+      function type() {
+        const currentText = nicknames[nickIndex];
+
+        if (isDeleting) {
+          textElement.textContent = currentText.substring(0, charIndex - 1);
+          charIndex--;
+          typingSpeed = 50; // 지울 땐 빠르게
+        } else {
+          textElement.textContent = currentText.substring(0, charIndex + 1);
+          charIndex++;
+          typingSpeed = 100; // 쓸 땐 보통 속도
+        }
+
+        if (!isDeleting && charIndex === currentText.length) {
+          isDeleting = true;
+          typingSpeed = 1500; // 다 쓰고 잠시 대기
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          nickIndex = (nickIndex + 1) % nicknames.length;
+          typingSpeed = 500; // 다 지우고 잠시 대기
+        }
+
+        setTimeout(type, typingSpeed);
+      }
+
+      // 페이지 로드 후 타이핑 시작
+      document.addEventListener("DOMContentLoaded", type);
+
+      /* --- 기능 2: 3D 마우스 틸트 효과 (Card Tilt) --- */
+      const container = document.getElementById("cardContainer");
+      const card = document.getElementById("card");
+
+      container.addEventListener("mousemove", (e) => {
+        const rect = container.getBoundingClientRect();
+        // 카드의 중심점 계산
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+
+        // 회전 각도 계산 (너무 과하지 않게 제한)
+        // x축 이동 -> y축 회전, y축 이동 -> x축 회전 (반대 방향)
+        const rotateY = x / 5; // 좌우 기울기
+        const rotateX = -y / 5; // 상하 기울기
+
+        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+        card.style.boxShadow = `${-x / 3}px ${
+          -y / 3 + 10
+        }px 20px rgba(0,0,0,0.15)`;
+      });
+
+      // 마우스가 떠나면 원래대로 복귀
+      container.addEventListener("mouseleave", () => {
+        card.style.transform = `rotateX(0) rotateY(0) scale(1)`;
+        card.style.boxShadow = `0 10px 30px rgba(0, 0, 0, 0.1)`;
+        card.style.transition = "transform 0.5s ease, box-shadow 0.5s ease";
+      });
+
+      // 마우스 진입 시 트랜지션 제거 (실시간 반응을 위해)
+      container.addEventListener("mouseenter", () => {
+        card.style.transition = "none";
+      });
+    </script>
+  </body>
+</html>
